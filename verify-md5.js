@@ -24,8 +24,7 @@ async function main() {
 
         console.info(chalk.green(fullIsoName));
         if (md5Expected) {
-            const md5 = await FileUtils.computeMd5(fullIsoName);
-            const md5Computed = `MD5 (${fileName}) = ${md5}`;
+            const md5Computed = await FileUtils.computeMd5(fullIsoName);
 
             if (config.verbose) {
                 console.info(`MD5 expected: ${chalk.yellow(md5Expected)}`);
