@@ -1,5 +1,5 @@
 /*
-   This tool uploads a file to S3 and asks AWS to verify its integrity via a MD5 hash.
+   This tool uploads files to S3 and asks AWS to verify its integrity via a MD5 hash.
 
    Create IAM role with full S3 access via the AWS management console, then put your credentials in $HOME/.aws/credentials file (see https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-shared.html)
 
@@ -55,7 +55,7 @@ async function main() {
         alreadyUploaded.add(key);
     }
 
-    for (const fileName of FileUtils.iterateFilesInDirectory(config.path, ".iso")) {
+    for (const fileName of FileUtils.iterateFilesInDirectory(config.path, config.extensions)) {
         const progress = new TtyProgress();
         if (alreadyUploaded.has(fileName)) {
             console.info(chalk.gray(`Skipping "${fileName}": already uploaded`));

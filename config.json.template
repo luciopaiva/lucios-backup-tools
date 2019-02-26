@@ -1,5 +1,6 @@
 {
   "bucket": "my-backups",
   "path": "/path/to/folder/with/files/to/backup",
-  "verbose": false
+  "verbose": false,
+  "extensions": [".iso", ".tar"]
 }

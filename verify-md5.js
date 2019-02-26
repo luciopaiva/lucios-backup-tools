@@ -9,7 +9,6 @@
 const
     fs = require("fs"),
     path = require("path"),
-    crypto = require("crypto"),
     chalk = require("chalk"),
     config = require("./config.json"),
     FileUtils = require("./lib/file-utils");
@@ -27,7 +26,7 @@ function readMd5FileContents(relativePath) {
  * @return {void}
  */
 async function main() {
-    for (const fileName of FileUtils.iterateFilesInDirectory(config.path, ".iso")) {
+    for (const fileName of FileUtils.iterateFilesInDirectory(config.path, config.extensions)) {
         const md5FileName = fileName.replace(/\.iso$/i, ".md5");
         const md5Expected = readMd5FileContents(md5FileName);
 
