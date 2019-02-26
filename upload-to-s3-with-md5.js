@@ -10,22 +10,13 @@ const
     path = require("path"),
     chalk = require("chalk"),
     config = require("./config.json"),
+    {readMd5FileContents} = require("./lib/md5"),
     FileUtils = require("./lib/file-utils"),
     TtyProgress = require("./lib/tty-progress"),
     S3 = require("./lib/s3");
 
-function readMd5FileContents(relativePath) {
-    const fullMd5Name = path.join(config.path, relativePath);
-    try {
-        return fs.readFileSync(fullMd5Name, "utf-8").split("\n")[0];
-    } catch (e) {
-        return null;
-    }
-}
-
-async function uploadFile(fileName, updateProgress, appendMd5Extension = false) {
-    const md5FileName = appendMd5Extension ? fileName + ".md5" : fileName.replace(/\.[^.]+$/i, ".md5");
-    let md5 = readMd5FileContents(md5FileName);
+async function uploadFile(fileName, updateProgress) {
+    let md5 = readMd5FileContents(config, fileName);
 
     const fullFilePath = path.join(config.path, fileName);
 

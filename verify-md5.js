@@ -7,28 +7,18 @@
  */
 
 const
-    fs = require("fs"),
     path = require("path"),
     chalk = require("chalk"),
     config = require("./config.json"),
+    {readMd5FileContents} = require("./lib/md5"),
     FileUtils = require("./lib/file-utils");
-
-function readMd5FileContents(relativePath) {
-    const fullMd5Name = path.join(config.path, relativePath);
-    try {
-        return fs.readFileSync(fullMd5Name, "utf-8").split("\n")[0];
-    } catch (e) {
-        return null;
-    }
-}
 
 /**
  * @return {void}
  */
 async function main() {
     for (const fileName of FileUtils.iterateFilesInDirectory(config.path, config.extensions)) {
-        const md5FileName = fileName.replace(/\.iso$/i, ".md5");
-        const md5Expected = readMd5FileContents(md5FileName);
+        const md5Expected = readMd5FileContents(config, fileName);
 
         const fullIsoName = path.join(config.path, fileName);
 
