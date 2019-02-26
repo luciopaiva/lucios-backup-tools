@@ -16,7 +16,7 @@ const
     S3 = require("./lib/s3");
 
 async function uploadFile(fileName, updateProgress) {
-    let md5 = readMd5FileContents(config, fileName);
+    let md5 = readMd5FileContents(config.path, fileName);
 
     const fullFilePath = path.join(config.path, fileName);
 

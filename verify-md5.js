@@ -18,7 +18,7 @@ const
  */
 async function main() {
     for (const fileName of FileUtils.iterateFilesInDirectory(config.path, config.extensions)) {
-        const md5Expected = readMd5FileContents(config, fileName);
+        const md5Expected = readMd5FileContents(config.path, fileName);
 
         const fullIsoName = path.join(config.path, fileName);
 

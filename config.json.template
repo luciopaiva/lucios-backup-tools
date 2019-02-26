@@ -1,7 +1,7 @@
 {
   "bucket": "my-backups",
   "path": "/path/to/folder/with/files/to/backup",
-  "mirror-path": "/path/to/mirror/folder",
+  "mirrorPath": "/path/to/mirror/folder",
   "verbose": false,
   "extensions": [".iso", ".tar"]
 }

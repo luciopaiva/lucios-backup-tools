@@ -40,3 +40,9 @@ The script first checks which files already exist in the bucket and skips them (
 Given a local folder, this script checks all relevant files (.iso) to see if their hashes match their companion .md5 files. If there's a file named `some-file.iso`, the script will look for `some-file.md5` and see if its contents match the calculated MD5 hash for the file.
 
 This task takes some time for big files (we're talking 100MB or greater) since the MD5 has to be calculated.
+
+### verify-mirror.js
+
+When saving backups of my CDs and DVDs and before actually uploading to the cloud I keep one extra copy of each ISO and TAR file in a separate hard disk as well, in case the first one eventually fails.
+
+I was suspecting that I may have screwed up one of the copies, so I decided to write this script to verify that MD5 files in one disk match MD5 files on the other. `verify-md5.js` will do the job of verifying that MD5 files are matching the correct file hash and `verify-mirror.js` will make sure that MD5s across disks are also consistent.
