@@ -11,6 +11,7 @@ const
     chalk = require("chalk"),
     config = require("./config.json"),
     FileUtils = require("./lib/file-utils"),
+    TtyProgress = require("./lib/tty-progress"),
     S3 = require("./lib/s3");
 
 function readMd5FileContents(relativePath) {
@@ -22,7 +23,7 @@ function readMd5FileContents(relativePath) {
     }
 }
 
-async function uploadFile(fileName, appendMd5Extension = false) {
+async function uploadFile(fileName, updateProgress, appendMd5Extension = false) {
     const md5FileName = appendMd5Extension ? fileName + ".md5" : fileName.replace(/\.[^.]+$/i, ".md5");
     let md5 = readMd5FileContents(md5FileName);
 
@@ -32,7 +33,7 @@ async function uploadFile(fileName, appendMd5Extension = false) {
     if (md5) {
         md5 = md5.match(/=\s(\S+)/)[1];  // extract MD5 from BSD-style format
         console.info("> MD5: " + md5);
-        const error = await await S3.upload(config.bucket, fileName, fs.createReadStream(fullFilePath), md5);
+        const error = await await S3.upload(config.bucket, fileName, fs.createReadStream(fullFilePath), md5, updateProgress);
         if (!error) {
             console.info(`${fileName} ${chalk.green("UPLOADED, MD5 PASSED")}`);
         } else {
@@ -55,11 +56,12 @@ async function main() {
     }
 
     for (const fileName of FileUtils.iterateFilesInDirectory(config.path, ".iso")) {
+        const progress = new TtyProgress();
         if (alreadyUploaded.has(fileName)) {
             console.info(chalk.gray(`Skipping "${fileName}": already uploaded`));
             console.info("");
         } else {
-            await uploadFile(fileName);
+            await uploadFile(fileName, awsProgress => progress.update(awsProgress.loaded, awsProgress.total));
         }
     }
 }
