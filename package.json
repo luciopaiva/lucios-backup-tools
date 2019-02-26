@@ -1,0 +1,25 @@
+{
+  "name": "lucios-backup-tools",
+  "version": "1.0.0",
+  "description": "This is a toolkit I made to help me backup my old CDs and DVDs.",
+  "main": "verify-md5.js",
+  "dependencies": {
+    "aws-sdk": "^2.410.0",
+    "chalk": "^2.4.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luciopaiva/lucios-backup-tools.git"
+  },
+  "keywords": [],
+  "author": "Lucio Paiva",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/luciopaiva/lucios-backup-tools/issues"
+  },
+  "homepage": "https://github.com/luciopaiva/lucios-backup-tools#readme"
+}
