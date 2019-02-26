@@ -8,7 +8,6 @@
 const
     fs = require("fs"),
     path = require("path"),
-    crypto = require("crypto"),
     chalk = require("chalk"),
     config = require("./config.json"),
     FileUtils = require("./lib/file-utils"),
@@ -20,18 +19,6 @@ function readMd5FileContents(relativePath) {
         return fs.readFileSync(fullMd5Name, "utf-8").split("\n")[0];
     } catch (e) {
         return null;
-    }
-}
-
-async function uploadSampleString() {
-    const message = "hello world";
-    const fileName = "sample-file.txt";
-    const md5 = crypto.createHash("md5").setEncoding("hex").update(message).digest();
-    const error = await S3.upload(config.bucket, fileName, "hello world", md5);
-    if (!error) {
-        console.info(`${fileName} ${chalk.green("OK")}`);
-    } else {
-        console.info(`${fileName} ${chalk.red(`${error.code} - ${error.message}`)}`);
     }
 }
 
@@ -61,9 +48,19 @@ async function uploadFile(fileName, appendMd5Extension = false) {
  * @return {void}
  */
 async function main() {
-    // await uploadFile("032 - tar.tar", true);
+    const alreadyUploaded = new Set();
+    for await (const object of S3.listBucket(config.bucket)) {
+        const key = object["Key"];
+        alreadyUploaded.add(key);
+    }
+
     for (const fileName of FileUtils.iterateFilesInDirectory(config.path, ".iso")) {
-        await uploadFile(fileName);
+        if (alreadyUploaded.has(fileName)) {
+            console.info(chalk.gray(`Skipping "${fileName}": already uploaded`));
+            console.info("");
+        } else {
+            await uploadFile(fileName);
+        }
     }
 }
 
