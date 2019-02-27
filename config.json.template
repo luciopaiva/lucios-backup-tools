@@ -3,5 +3,6 @@
   "path": "/path/to/folder/with/files/to/backup",
   "mirrorPath": "/path/to/mirror/folder",
   "verbose": false,
-  "extensions": [".iso", ".tar"]
+  "extensions": [".iso", ".tar"],
+  "compareDirectoriesCaseInsensitive": false
 }

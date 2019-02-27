@@ -3,6 +3,7 @@ const
     fs = require("fs"),
     chalk = require("chalk"),
     moment = require("moment"),
+    config = require("./config.json"),
     TarNavigator = require("./lib/tar-navigator"),
     FileUtils = require("./lib/file-utils");
 
@@ -37,13 +38,15 @@ async function main(args) {
     /** @type {Map<String, FileTuple>} */
     const leftFileTuplesByName = new Map();
     for (const fileTuple of iterateFiles(leftPath)) {
-        leftFileTuplesByName.set(fileTuple.name, fileTuple);
+        const name = config.compareDirectoriesCaseInsensitive ? fileTuple.name.toLowerCase() : fileTuple.name;
+        leftFileTuplesByName.set(name, fileTuple);
     }
 
     /** @type {Map<String, FileTuple>} */
     const rightFileTuplesByName = new Map();
     for (const fileTuple of iterateFiles(rightPath)) {
-        rightFileTuplesByName.set(fileTuple.name, fileTuple);
+        const name = config.compareDirectoriesCaseInsensitive ? fileTuple.name.toLowerCase() : fileTuple.name;
+        rightFileTuplesByName.set(name, fileTuple);
     }
 
     const allFileNames = new Set();
