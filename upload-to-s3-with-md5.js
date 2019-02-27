@@ -22,8 +22,8 @@ async function uploadFile(fileName, updateProgress) {
 
     console.info(chalk.green(fullFilePath));
     if (md5) {
-        md5 = md5.match(/=\s(\S+)/)[1];  // extract MD5 from BSD-style format
         console.info("> MD5: " + md5);
+        console.info(`> Size: ${(fs.statSync(fullFilePath).size / 1024 / 1024).toFixed(0)}MB`);
         const error = await await S3.upload(config.bucket, fileName, fs.createReadStream(fullFilePath), md5, updateProgress);
         if (!error) {
             console.info(`${fileName} ${chalk.green("UPLOADED, MD5 PASSED")}`);
