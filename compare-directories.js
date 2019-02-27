@@ -53,19 +53,29 @@ async function main(args) {
     sortedFileNames.sort();
 
     let anyDifferences = false;
+    const onlyLeft = new Set();
+    const onlyRight = new Set();
+    const sizesDontMatch = new Map();
+    const timesDontMatch = new Map();
 
     for (const fileName of allFileNames) {
         const leftFile = leftFileTuplesByName.get(fileName);
         const rightFile = rightFileTuplesByName.get(fileName);
 
-        if (!leftFile || !rightFile) {
-            console.info(`"${fileName}": ${!leftFile && "NOT"} FOUND ${!rightFile && "NOT"} FOUND`);
+        if (!leftFile) {
+            onlyRight.add(fileName);
+            anyDifferences = true;
+            continue;
+        }
+
+        if (!rightFile) {
+            onlyLeft.add(fileName);
             anyDifferences = true;
             continue;
         }
 
         if (leftFile.size !== rightFile.size) {
-            console.info(`"${fileName}" sizes: ${leftFile.size} ${rightFile.size}`);
+            sizesDontMatch.set(fileName, [leftFile.size, rightFile.size]);
             anyDifferences = true;
             continue;
         }
@@ -73,13 +83,44 @@ async function main(args) {
         const leftTime = moment(leftFile.atime).seconds(0).valueOf();
         const rightTime = moment(rightFile.atime).seconds(0).valueOf();
         if (leftTime !== rightTime) {
-            console.info(`"${fileName}" atime: ${moment(leftTime).format()} ${moment(rightTime).format()}`);
+            timesDontMatch.set(fileName, [moment(leftTime).format(), moment(rightTime).format()]);
             anyDifferences = true;
         }
     }
 
     if (!anyDifferences) {
         console.info(chalk.green("Directories are identical!"));
+    } else {
+        if (onlyLeft.size > 0) {
+            console.info(`Files only in "${leftPath}":`);
+            for (const fileName of onlyLeft) {
+                console.info(`  - ${fileName}`);
+            }
+        }
+        if (onlyRight.size > 0) {
+            console.info(`Files only in "${rightPath}":`);
+            for (const fileName of onlyRight) {
+                console.info(`  - ${fileName}`);
+            }
+        }
+        if (sizesDontMatch.size > 0) {
+            console.info("Sizes don't match:");
+            for (const [fileName, [sizeLeft, sizeRight]] of sizesDontMatch) {
+                console.info(`  - "${fileName}: ${sizeLeft}, ${sizeRight}`);
+            }
+        }
+        if (timesDontMatch.size > 0) {
+            console.info("Times don't match:");
+            for (const [fileName, [timeLeft, timeRight]] of timesDontMatch) {
+                console.info(`  - "${fileName}: ${timeLeft}, ${timeRight}`);
+            }
+        }
+
+        console.info("Summary:");
+        console.info("  - only left: " + onlyLeft.size);
+        console.info("  - only right: " + onlyRight.size);
+        console.info("  - conflicting sizes: " + sizesDontMatch.size);
+        console.info("  - conflicting times: " + timesDontMatch.size);
     }
 }
 
