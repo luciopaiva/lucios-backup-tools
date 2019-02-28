@@ -4,5 +4,8 @@
   "mirrorPath": "/path/to/mirror/folder",
   "verbose": false,
   "extensions": [".iso", ".tar"],
-  "compareDirectoriesCaseInsensitive": false
+  "compareDirectoriesCaseInsensitive": false,
+  "workingDirectory": "/path/to/working/directory",
+  "knownTextExtensions": ["txt", "html", "htm"],
+  "badSectorTextFillIn": "MARKED-AS-BAD-SECTOR-"
 }
