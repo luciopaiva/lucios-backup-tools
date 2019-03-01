@@ -3,7 +3,7 @@
 
 This is a toolkit I made to help me backup my old CDs and DVDs.
 
-![](20190228-1502-read-single-file.png)
+![](screenshots/20190228-2047-read-single-file.png)
 
 ## How to install
 
