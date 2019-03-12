@@ -67,6 +67,14 @@ When you use tar to copy files from a CD, it will print to stderr those whose co
 
 If some file is sitting right where a bad sector is, you want to try this script. It will read chunk by chunk, seeing what it can recover. For chunks that fail, it just fills in the output file with either text or 0x00 (depending on the file extension).
 
+### compare-directories.js
+
+As the name implies, this script receives the path to two directories and compares them. The comparison is made file by file, checking whether the file exists in both folders and also if their sizes and modification dates match.
+
+### tar-outcome-treeview.js
+
+This script compares stdout and stderr outputs from tar to highlight which files failed in a tree-like folder structure. If helps to understand the magnitude of the problem when some medium has bad sectors.
+
 ## What I learned
 
 These are some random notes I want to make right now before I forget.
