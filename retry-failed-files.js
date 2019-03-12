@@ -72,7 +72,7 @@ async function main(tarStdErrFile, pathToCd) {
     const outputTarFileName = moment().format("YYYYMMDD-HHmmss[.tar]");
     const outputTarFullPath = path.join(config.workingDirectory, outputTarFileName);
     const output = await TarNavigator.createTarWithFiles(outputTarFullPath, ...fileListing);
-    fs.writeFileSync(outputTarFileName + ".txt", output);
+    fs.writeFileSync(outputTarFullPath + ".txt", output);
 }
 
 main(...process.argv.slice(2));
