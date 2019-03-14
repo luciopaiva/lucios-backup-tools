@@ -75,6 +75,10 @@ As the name implies, this script receives the path to two directories and compar
 
 This script compares stdout and stderr outputs from tar to highlight which files failed in a tree-like folder structure. If helps to understand the magnitude of the problem when some medium has bad sectors.
 
+### compute-md5-files-in-dir.js
+
+Quick script to generate md5 for all files in the working directory whose extensions are known. One md5 file will be created for each file.
+
 ## What I learned
 
 These are some random notes I want to make right now before I forget.
