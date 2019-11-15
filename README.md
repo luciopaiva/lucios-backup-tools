@@ -13,7 +13,7 @@ The scripts need Node.js to run. Best is to use nvm to install the correct versi
 
 Once nvm is installed, run the following command at the root of this repo:
 
-    nvm use
+    nvm install
 
 It will download and install the correct Node.js version locally.
 
