@@ -1,7 +1,7 @@
 
 # Lucio's backup tools
 
-This is a toolkit I made to help me backup my old CDs and DVDs.
+This is a toolkit I made to help me backup my old CDs and DVDs to AWS.
 
 ![](screenshots/20190228-2047-read-single-file.png)
 
@@ -19,7 +19,7 @@ It will download and install the correct Node.js version locally.
 
 ### AWS access key
 
-Needless to say, you also need an AWS account. Considering you have one, generate an IAM access key with full S3 access and create a file at `$HOME/.aws/credentials` with it (or add it to your environment vars), otherwise scripts will fail.
+Needless to say, you need an AWS account. Generate an IAM access key with full S3 access and create a file at `$HOME/.aws/credentials` with it (or add it to your environment vars), otherwise scripts will fail.
 
 ### config.json
 
@@ -38,6 +38,37 @@ Typical recovery scenario:
   this will output a list of files that failed
 - considering some files failed, you can now try `retry-failed-files.js` and see if reading again solves the problem at least for some of them
 - if the files still fail, depending on the file you should be fine with recovering just parts of it (some text file, images, etc). For that, use `read-single-file.js`. It will recover all sectors it can, showing you how many failed and filling in the output file to compensate for the failed sectors
+
+### Example backup scenario
+
+I have a folder with lots of files to back up. First I compress them using tar:
+
+    tar -czvf backup.tgz path-to-folder-with-files-to-backup
+
+Then I move the tgz file to the folder specified by the `path` property in `config.json`. Now I generate the md5 checksum by running:
+
+    md5 backup.tgz > backup.md5
+
+Once the md5 checksum is computed, I can use it to validate the file:
+
+    node verify-md5
+
+It should show something like this:
+
+    /Users/myuser/my-backups/backup.tgz
+    PASSED
+
+Now I make sure that my AWS credentials are set in `~/.aws/credentials`. They must be generated in the IAM service panel with full S3 access permissions. The credentials file should look like this:
+
+    [default]
+    aws_access_key_id=NSDKCJNSDKCJSDKN
+    aws_secret_access_key=NAKSDCJNAKSD2489nDCSKCDJ
+
+If `aws` CLI tool is installed, `aws configure` can be used to set up the access key.
+
+Finally, run the upload script:
+
+    node upload-to-s3-with-md5.js
 
 ## Tools
 
