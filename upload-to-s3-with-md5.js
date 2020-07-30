@@ -24,7 +24,7 @@ async function uploadFile(fileName, updateProgress) {
     if (md5) {
         console.info("> MD5: " + md5);
         console.info(`> Size: ${(fs.statSync(fullFilePath).size / 1024 / 1024).toFixed(0)}MB`);
-        const error = await await S3.upload(config.bucket, fileName, fs.createReadStream(fullFilePath), md5, updateProgress);
+        const error = await S3.upload(config.bucket, fileName, fs.createReadStream(fullFilePath), md5, updateProgress);
         if (!error) {
             console.info(`${fileName} ${chalk.green("UPLOADED, MD5 PASSED")}`);
         } else {
@@ -41,11 +41,14 @@ async function uploadFile(fileName, updateProgress) {
  */
 async function main() {
     const alreadyUploaded = new Set();
+
+    console.info(`Listing contents for bucket '${config.bucket}'...`);
     for await (const object of S3.listBucket(config.bucket)) {
         const key = object["Key"];
         alreadyUploaded.add(key);
     }
 
+    console.info("Iterating local files...");
     for (const fileName of FileUtils.iterateFilesInDirectory(config.path, config.extensions)) {
         const progress = new TtyProgress();
         if (alreadyUploaded.has(fileName)) {
