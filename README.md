@@ -78,6 +78,16 @@ Given a local folder, uploads all relevant files (relevant extensions configurab
 
 The script first checks which files already exist in the bucket and skips them (it tells you in case it does).
 
+The script also handles files bigger than 5GB, which require multipart upload. It will very likely handle faults by itself. In case it doesn't, however, it's easy to manually fix things. You just need to make sure that the upload is properly aborted. To do that, check your bucket for open uploads:
+
+    aws s3api list-multipart-uploads --bucket BUCKETNAME
+
+If it returns an empty response, it's all fine. If it returns a JSON containing your upload id, you want to abort it using the following command:
+
+    aws s3api abort-multipart-upload --bucket BUCKETNAME --key "FILE-KEY" --upload-id "UPLOAD-ID"
+
+Then run the list command again to confirm it's gone.
+
 ### verify-md5.js
 
 Given a local folder, this script checks all relevant files (.iso) to see if their hashes match their companion .md5 files. If there's a file named `some-file.iso`, the script will look for `some-file.md5` and see if its contents match the calculated MD5 hash for the file.
