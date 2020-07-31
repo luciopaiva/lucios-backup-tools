@@ -5,6 +5,12 @@ This is a toolkit I made to help me backup my old CDs and DVDs to AWS.
 
 ![](screenshots/20190228-2047-read-single-file.png)
 
+*Reading file from source with bad sectors*
+
+![](screenshots/20200731-0130-upload-multipart.png)
+
+*Uploading 8GB multipart backup file to S3*
+
 ## How to install
 
 ### Node.js
