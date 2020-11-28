@@ -25,7 +25,13 @@ It will download and install the correct Node.js version locally.
 
 ### AWS access key
 
-Needless to say, you need an AWS account. Generate an IAM access key with full S3 access and create a file at `$HOME/.aws/credentials` with it (or add it to your environment vars), otherwise scripts will fail.
+Needless to say, you need an AWS account. Generate an IAM access key (check the IAM service panel in AWS console) with full S3 access and create a file at `$HOME/.aws/credentials` with it (or add it to your environment vars), otherwise scripts will fail. The credentials file should look like this:
+
+    [default]
+    aws_access_key_id=NSDKCJNSDKCJSDKN
+    aws_secret_access_key=NAKSDCJNAKSD2489nDCSKCDJ
+
+If `aws` CLI tool is installed, `aws configure` can be used to set up the access key.
 
 ### config.json
 
@@ -35,21 +41,24 @@ Last, create a `config.json` file based on `config.json.template` and specify:
 - directory with files to upload to S3
 - list of extensions the script should care about when choosing which files to upload
 
-## How to use these tools
+## Use cases
 
-Typical recovery scenario:
+This session shows possible use cases for this toolkit. Check the next session for more details on individual tools.
 
-- if the CD is single-session, use some tool like K3b and rip it all at once. If it succeeds, done
-- if the CD is multi-session or the above failed, then run `old-stuff/backup-mounted-to-tar.sh`
-  this will output a list of files that failed
-- considering some files failed, you can now try `retry-failed-files.js` and see if reading again solves the problem at least for some of them
-- if the files still fail, depending on the file you should be fine with recovering just parts of it (some text file, images, etc). For that, use `read-single-file.js`. It will recover all sectors it can, showing you how many failed and filling in the output file to compensate for the failed sectors
+### CD recovery scenario
 
-### Example backup scenario
+- if the CD is single-session, use some tool like K3b and rip it all at once. If it succeeds, done;
+- if the CD is multi-session or the above failed, then run `old-stuff/backup-mounted-to-tar.sh` - besides using tar to overcome the single-session limitation, this will also output a list of files that failed;
+- considering some files failed, you can now play with `retry-failed-files.js` and see if reading again solves the problem at least for some of them;
+- if the files still fail, depending on the file you will want to at least recover parts of it (e.g.: text files, images, etc). For that, use `read-single-file.js`. It will recover all sectors it can, showing you how many failed and filling in the output file to compensate for the failed sectors.
 
-I have a folder with lots of files to back up. First I compress them using tar:
+### Folder one-time backup scenario
+
+I have a folder with lots of files to back up. Probably an old HD with files that I should've backed up a long time ago. I start by compressing them using tar:
 
     tar -czvf backup.tgz path-to-folder-with-files-to-backup
+
+Using tar is great because it preserves time stamps, in case that is important to you. For instance, your folder may have photographs and you want to know when you took them (or at least when you uploaded them from your camera). Manually copying files can touch the time stamp, what would overwrite the original information.
 
 Then I move the tgz file to the folder specified by the `path` property in `config.json`. Now I generate the md5 checksum by running:
 
@@ -64,15 +73,7 @@ It should show something like this:
     /Users/myuser/my-backups/backup.tgz
     PASSED
 
-Now I make sure that my AWS credentials are set in `~/.aws/credentials`. They must be generated in the IAM service panel with full S3 access permissions. The credentials file should look like this:
-
-    [default]
-    aws_access_key_id=NSDKCJNSDKCJSDKN
-    aws_secret_access_key=NAKSDCJNAKSD2489nDCSKCDJ
-
-If `aws` CLI tool is installed, `aws configure` can be used to set up the access key.
-
-Finally, run the upload script:
+Make sure that proper AWS credentials are set in `~/.aws/credentials` (see the AWS access key section above) and run the upload script:
 
     node upload-to-s3-with-md5.js
 
@@ -80,7 +81,7 @@ Finally, run the upload script:
 
 ### upload-to-s3-with-md5.js
 
-Given a local folder, uploads all relevant files (relevant extensions configurable via config.json) to S3, also validating them after they're uploaded via the MD5 AWS HTTP header. If remote file doesn't match the hash, the script will warn you.
+Given a local folder, this tool uploads all relevant files (relevant extensions configurable via config.json) to S3, also validating them after they're uploaded via the MD5 AWS HTTP header. If the remote file doesn't match the hash, the script will warn you.
 
 The script first checks which files already exist in the bucket and skips them (it tells you in case it does).
 
@@ -126,15 +127,21 @@ This script compares stdout and stderr outputs from tar to highlight which files
 
 Quick script to generate md5 for all files in the working directory whose extensions are known. One md5 file will be created for each file.
 
-## What I learned
+## Random notes
 
-These are some random notes I want to make right now before I forget.
+These are some random notes I kept here since its findings happened when I was using this toolkit (and also for lack of a better place to put them).
 
-It looks like some CD-Rs age to the point where they become unreadable. Even media with few to no scratches become unrecoverable. It may be simply due to the way the technology works and CD-RWs would be even more problematic. Some CD-Rs from late 90s are still perfectly readable to this date (2019). It could be that those CDs were kept more protected than the ones failing, but at least they were kept under the same environment conditions (temperature and humidity). Some media became unreadable with just 5 years of storage.
+### Media deterioration
 
-Beware that some rescuing tools only see the first session and you might miss data from multi-session CDs if you are not aware of that.
+It looks like some CD-Rs age to the point where they become unreadable. Even media with few to no scratches become unrecoverable. It may be simply due to the way the technology works and CD-RWs would be even more problematic. Some CD-Rs from late 90s are still perfectly readable to this date (2019). It could be that those CDs were kept more protected than the ones failing, but I can assure they were kept under the same environment conditions (temperature and humidity). Some media became unreadable with just 5 years of storage, while others that sat right next to it have the same age and are perfectly readable.
 
-Beware of the way you copy your data from the CD as well, as you might lose date information. I found out that `tar` is an excellent tool to backup data, not only because it keeps the original modification dates, but also because it dumps the list of files which it failed to copy but it does not stop when it encounters them.
+### Beware of multi-session media
+
+Some rescuing tools only see the first session and you might miss data from multi-session CDs if you are not aware of that.
+
+### tar is the best
+
+Beware of the way you copy your data from the CD as well, as you might lose time stamp information. I found out that `tar` is an excellent tool to backup data, not only because it keeps the original modification dates, but also because it dumps the list of files which it failed to copy but it does not stop when it encounters them.
 
 A caveat is that `tar` still lists failed files inside the final tar file. If it's able to read part of the file, it will save the part it read and just fill the rest of the file with zeroes. Because of that, it's nice to keep the list of files that failed together with the final tar file so that you know exactly which files had their integrity compromised. This is what the tar output looks like:
 
@@ -142,8 +149,10 @@ A caveat is that `tar` still lists failed files inside the final tar file. If it
 
 In the case above, it means that we lost 280886 bytes when reading and tar warns us that it appended that many number of zeroes. Every time I saw this happening, it was in the end of the file, i.e., it seems that tar probably just gives up reading the rest of the file as soon as it encounters the first problem. It may be an operating system thing, though.
 
-I also tried cleaning a CD-R, first with soap, then with toothpaste. I made sure to scrub the surface gently from the center straight to the edges and I also let the toothpaste dry a bit before washing it out. Results are inconclusive. Although I managed to get a few files that I couldn't copy before, it can be that there was pure luck the reader was able to read better this time. I'd have to test this more to come to a better conclusion.
+### Physically cleaning the media before reading
+
+I also tried cleaning a CD-R, first with soap, then with toothpaste. I made sure to scrub the surface gently from the center straight to the edges and I also let the toothpaste dry a bit before washing it out. Results are inconclusive. Although I managed to get a few files that I couldn't copy before, it could just have been pure luck when reading for the n-th time. I'd have to test this more to come to a better conclusion.
 
 ### The 0x573A0000 mystery
 
-Of the 4 media that presented issues when doing a backup of all my CDs/DVDs, 3 of them had the same exact problem: the first 0x573a0000 bytes were perfectly readable, but the rest simply failed. I tried ddrescue and Nero Burning ROM (the same program that burned them in the first place - I know because it's written in the metadata section of the DVDs), but to no avail. They all stop reading at sector 714560 (and each sector has 2048 bytes, totalling 0x573a0000 bytes). It smells like some problem during recording, since all 3 look like they were recorded on the same day. All 3 are Kodak DVD-R media, so it can be something wrong with the DVD itself, or it was Nero that failed. If I had them tested on the same day, they would have probably failed just the same - it doesn't look like they aged or something.
+Of the 4 media that presented issues when doing a backup of all my CDs/DVDs, 3 of them had the same exact problem: the first 0x573a0000 bytes were perfectly readable, but the rest simply failed. I tried ddrescue and Nero Burning ROM (the same program that burned them in the first place - I know because it's written in the metadata section of the DVDs), but to no avail. They all stop reading at sector 714560 (and each sector has 2048 bytes, totalling 0x573a0000 bytes). It smells like some problem during recording, since all 3 look like they were recorded on the same day. All 3 are Kodak DVD-R media, so it can be something wrong with the DVD itself, or it was Nero that failed. If I had them tested on the same day (assuming I didn't - long time, can't remember), they would have probably failed just the same - it doesn't look like they aged or something.
