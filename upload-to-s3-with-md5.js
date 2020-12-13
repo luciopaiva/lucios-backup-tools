@@ -113,7 +113,7 @@ async function main() {
     const alreadyUploaded = new Set();
 
     console.info(`Listing contents for bucket '${config.bucket}'...`);
-    for await (const object of S3.listBucket(config.bucket)) {
+    for (const object of await S3.listBucket(config.bucket)) {
         const key = object["Key"];
         alreadyUploaded.add(key);
     }
