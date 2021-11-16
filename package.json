@@ -4,7 +4,7 @@
   "description": "This is a toolkit I made to help me backup my old CDs and DVDs.",
   "main": "verify-md5.js",
   "dependencies": {
-    "aws-sdk": "^2.410.0",
+    "aws-sdk": "^2.814.0",
     "chalk": "^2.4.2",
     "moment": "^2.24.0"
   },
